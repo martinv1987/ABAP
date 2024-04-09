@@ -185,24 +185,25 @@ ENDIF.
                  continue.
                endif.
                enddo.
+               AT NEW INDEXLIBRO.
+                  IF I_TOTALES IS NOT INITIAL.
+                       LOOP AT I_TOTALES ASSIGNING FIELD-SYMBOL(<FS_TOTALES>) WHERE INDEXLIBRO = <FS_LIBROS>-INDEXLIBRO.
+                            CONDENSE <FS_TOTALES>-VALORCELDA.
+                            LO_WORKSHEET->SET_CELL( IP_COLUMN = <FS_TOTALES>-COLUMNA IP_ROW = <FS_TOTALES>-FILA IP_VALUE = <FS_TOTALES>-VALORCELDA IP_STYLE = LV_STYLE_YELLOW_GUID ).
+                       ENDLOOP.
+                    ENDIF.
+
+                    IF I_MERGECELLS IS NOT INITIAL.
+                       LOOP AT I_MERGECELLS ASSIGNING FIELD-SYMBOL(<FS_MERGECELLS>) WHERE INDEXLIBRO = <FS_LIBROS>-INDEXLIBRO.
+                          IF SY-SUBRC EQ 0.
+                             CONDENSE <FS_MERGECELLS>-VALORCELDA.
+                             LO_WORKSHEET->SET_CELL( IP_ROW = <FS_MERGECELLS>-INDEXMERGE IP_COLUMN = <FS_MERGECELLS>-INICIO IP_VALUE = <FS_MERGECELLS>-VALORCELDA IP_STYLE = LV_STYLE_BLUE_GUID ).
+                             LO_WORKSHEET->SET_MERGE( IP_ROW = <FS_MERGECELLS>-INDEXMERGE IP_COLUMN_START = <FS_MERGECELLS>-INICIO IP_COLUMN_END = <FS_MERGECELLS>-FIN IP_ROW_TO = <FS_MERGECELLS>-INDEXMERGE IP_STYLE = LV_STYLE_BLUE_GUID ).
+                          ENDIF.
+                       ENDLOOP.
+                    ENDIF.
+               ENDAT.
       endloop.
-
-      if i_totales is not initial.
-         loop at i_totales assigning field-symbol(<fs_totales>).
-              condense <fs_totales>-valorcelda.
-              lo_worksheet->set_cell( ip_column = <fs_totales>-columna ip_row = <fs_totales>-fila ip_value = <fs_totales>-valorcelda ).
-         endloop.
-      endif.
-
-      if i_mergecells is not initial.
-         loop at i_mergecells assigning field-symbol(<fs_mergecells>).
-            if sy-subrc eq 0.
-               condense <fs_mergecells>-valorcelda.
-               lo_worksheet->set_cell( ip_row = <fs_mergecells>-indexmerge ip_column = <fs_mergecells>-inicio ip_value = <fs_mergecells>-valorcelda ip_style = lv_style_blue_guid ).
-               lo_worksheet->set_merge( ip_row = <fs_mergecells>-indexmerge ip_column_start = <fs_mergecells>-inicio ip_column_end = <fs_mergecells>-fin ip_row_to = <fs_mergecells>-indexmerge ip_style = lv_style_blue_guid ).
-            endif.
-         endloop.
-      endif.
 
       try.
           CREATE OBJECT lo_excel_writer TYPE zcl_excel_writer_2007."Se crea el documento
